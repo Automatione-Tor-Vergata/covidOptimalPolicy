@@ -124,7 +124,7 @@ classdef COVIDGridworld < rl.env.MATLABEnvironment
             this.n_people = people;
             this.map_mat = map;
             this.targets = target_indices;
-            this.State = zeros(people, 1);
+            this.State = zeros(people, 1); 
             this.defeat_rew = -1000 * num_cells;
             this.Colors = colors;
             this.contagion_prob = covid_prob;
@@ -363,7 +363,7 @@ classdef COVIDGridworld < rl.env.MATLABEnvironment
                         continue
                         
                     %Check if the position is in a set.
-                    elseif (abs(new_row-row_tar)>2 || abs(new_col-col_tar)>2)
+                    elseif (abs(new_row-row_tar)>2 || abs(new_col-col_tar)>2) 
                         % A new random extraction is necessary. 
                         continue
                        
