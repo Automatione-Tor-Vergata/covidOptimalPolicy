@@ -24,7 +24,7 @@ function sarsa_agent = makeCriticAgent(envCovid)
 
     % Add Layer Branches
     % Add the branches of the network to the layer graph. Each branch is a linear array of layers.
-    % imageInputLayer([Alteza, Larghezza, NumCanali],...), dove NumCanali Ã¨ sempre e comunque double
+    % imageInputLayer([Alteza, Larghezza, NumCanali],...), dove NumCanali è sempre e comunque double
     tempLayers = imageInputLayer([obsInfo.Dimension(1) obsInfo.Dimension(2) 1], ... 
         "Name","StateInput","Normalization","none")
     lgraph = addLayers(lgraph,tempLayers)
@@ -55,16 +55,22 @@ function sarsa_agent = makeCriticAgent(envCovid)
     lgraph = connectLayers(lgraph,"ActionInput","concat/in2"); %in2 da man di connectLayers
 
     % ############## Critic Creation ##############
+    
+    % "sgdm" e Momentum = 1 (0.99) creano un agente di tipo Montecarlo
+    
     device = "cpu";
-    critic_opt = rlRepresentationOptions('UseDevice',device, "Optimizer","adam", 'LearnRate',0.025);
+    critic_opt = rlRepresentationOptions('UseDevice',device, "Optimizer","sgdm", 'LearnRate',0.01);
+%     critic_opt = rlOptimizerOptions('UseDevice',device);%('UseDevice',device, "Optimizer",sgdm, 'LearnRate',0.01);
+%     critic_opt.Algorithm = "sgdm";
+%     critic_opt.OptimizerParameters.Momentum = 0.99;
     critic = rlQValueRepresentation(lgraph,obsInfo,actInfo,'Observation',"StateInput",'Action',"ActionInput", critic_opt) ;
 
     % ############## Agent Creation ##############
     optSarsa = rlSARSAAgentOptions;
-    optSarsa.EpsilonGreedyExploration.Epsilon = 0.7;
-    optSarsa.EpsilonGreedyExploration.EpsilonDecay = 0.001;
-    optSarsa.EpsilonGreedyExploration.EpsilonMin = 0.01;
-    optSarsa.DiscountFactor = 1;
+    optSarsa.EpsilonGreedyExploration.Epsilon = 0.3; % in TD era 0.7
+%   optSarsa.EpsilonGreedyExploration.EpsilonDecay = 0.001; % con un decadimento di 0.001 
+    optSarsa.EpsilonGreedyExploration.EpsilonMin = 0.3; % e un minimo di 0.01
+    optSarsa.DiscountFactor = 0.99;
     sarsa_agent = rlSARSAAgent(critic,optSarsa);
     
 %     optDQL = rlDQNAgentOptions('MiniBatchSize',48);
