@@ -28,11 +28,17 @@ maxNumCompThreads(6); % Limit CPU cores usage
 %% Create the training algorithm.
 sarsa_agent = makeCriticAgent(covid_two_env);
 
-%load sarsaTrain.mat
+load sarsaTrain.mat
+load critic_params_trained.mat
+
+critic = getCritic(sarsa_agent);
+critic = setLearnableParameters(critic,criticParams);
+setCritic(sarsa_agent,critic);
+
 
 trainOpts = rlTrainingOptions(...
-    'MaxEpisodes',100,...
-    'MaxStepsPerEpisode',50,...
+    'MaxEpisodes',1000,...
+    'MaxStepsPerEpisode',25,...
     'StopTrainingCriteria',"AverageReward",...
     'StopTrainingValue',0, ...
     'Verbose',true,...
@@ -46,7 +52,6 @@ trainOpts.ParallelizationOptions.WorkerRandomSeeds = -1;
 trainOpts.StopOnError = 'off';
 
 %% Train the agent in the environment.
-% plot(covid_three_env);
 
 trainStats = train(sarsa_agent,covid_two_env,trainOpts);
 
@@ -54,18 +59,9 @@ trainStats = train(sarsa_agent,covid_two_env,trainOpts);
 critic = getCritic(sarsa_agent);
 criticParams = getLearnableParameters(critic);
 
-save("sarsaTrain.mat",'trainStats','covid_three_env','trainOpts');
+save("sarsaTrain.mat",'trainStats','covid_two_env','trainOpts');
 
-% Extract Weight of the network
-critic = getCritic(sarsa_agent);
-criticParams = getLearnableParameters(critic);
+save("critic_params_trained",'criticParams');
 
-% %% RESUME
-% sarsa_agent = makeCriticAgent(covid_three_env);
-% load sarsaTrain.mat
-% trainStats = train(sarsa_agent,covid_three_env,trainOpts);
-% save("sarsaTrain.mat",'trainStats','covid_three_env','trainOpts');
-% 
-% % Extract Weight of the network
-% critic = getCritic(sarsa_agent);
-% criticParams = getLearnableParameters(critic);
+
+
