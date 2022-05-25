@@ -30,14 +30,14 @@ sarsa_agent = makeCriticAgent(covid_two_env);
 
 load sarsaTrain.mat
 load critic_params_trained.mat
-
+%%
 critic = getCritic(sarsa_agent);
 critic = setLearnableParameters(critic,criticParams);
 setCritic(sarsa_agent,critic);
 
 
 trainOpts = rlTrainingOptions(...
-    'MaxEpisodes',1000,...
+    'MaxEpisodes',100,...
     'MaxStepsPerEpisode',25,...
     'StopTrainingCriteria',"AverageReward",...
     'StopTrainingValue',0, ...
@@ -60,8 +60,19 @@ critic = getCritic(sarsa_agent);
 criticParams = getLearnableParameters(critic);
 
 save("sarsaTrain.mat",'trainStats','covid_two_env','trainOpts');
+save("critic_params_trained_2pe",'criticParams');
 
-save("critic_params_trained",'criticParams');
+%%
+trainOpts.Verbose = false;
+trainOpts.Plots = "training-progress";
 
+plot(covid_two_env);
+
+codiv_two_end.ResetFcn = @() 2;
+codiv_two_end.Model.Viewer.ShowTrace = false;
+%%
+
+%simOptions = rlSimulationOptions('MaxSteps',500);
+experience = sim(covid_two_env,sarsa_agent);
 
 
